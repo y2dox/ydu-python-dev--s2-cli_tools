@@ -25,5 +25,5 @@ tasks:
   test:
     desc: runn ci tests
     cmds:
-      - task -s test_apipy:test_on_op_full
+      - task -s test_apipy:test_on_op_full__cmdlines 2>/dev/null
 
