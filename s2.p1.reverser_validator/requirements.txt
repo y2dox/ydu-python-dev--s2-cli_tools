@@ -1,1 +1,5 @@
+pydantic
+loguru
+fire
+pyyaml
 pytest

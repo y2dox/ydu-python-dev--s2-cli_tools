@@ -11,14 +11,25 @@ tasks:
     silent: true
     cmds:
     - if [[ "{{.show_env}}" != "" ]]; then env ; fi
-
     - |-
-      echo "
-      ---
+      echo "---
       _wenv_var={{._wenv_var}}
       {{._wenv_var}}=${{._wenv_var}}
-      conda_main_deps_file={{.conda_main_deps_file}}
+      conda_main_deps_file={{.conda_main_deps_file}} \
       "
+
+  cenv-resolve:
+    desc: resolves conda or pip env
+    cmds:
+    - task: cenv-ensure
+      vars:
+        conda_main_deps_file: '{{.conda_main_deps_file}}'
+        _wenv_var: '{{._wenv_var}}'
+
+    - task: runcmd_with_cvenv_activated
+      vars:
+        cmd: 'task conda_env_man:update_env4py_from_reqs_file'
+        _wenv_var: '{{._wenv_var}}'
 
   cenv-ensure:
     desc: asserts that cenv-exists
@@ -40,6 +51,7 @@ tasks:
       conda create -y -n ${{._wenv_var}} \
         $({{.conda_main_deps_linepart}})
 
+
   show-activate:
     desc: show activate command
     silent: true
@@ -51,7 +63,9 @@ tasks:
     - |-
       export _NEXT_CENV=${{._wenv_var}}
       bash --login -c '
+      conda deactivate; conda deactivate || true
       conda activate $_NEXT_CENV
+      which python | grep "$_NEXT_CENV" || exit 1
         {{.cmd}}
       '
   shell_cenv:
@@ -76,3 +90,8 @@ tasks:
     cmds:
     - |-
       conda run {{.cmd}} -n ${{._wenv_var}}
+
+  update_env4py_from_reqs_file:
+    desc: _
+    cmds:
+    - pip install -r requirements.txt
