@@ -13,42 +13,6 @@ tasks:
       - echo "{{.GREETING}}"
     silent: true
 
-  test_one_op:
-    _desc: test one cli operation
-    vars:
-      tool_path: '{{ default .tool_path .tool_path}}'
-      step_name: '{{ default .title .step_name }}'
-    cmds:
-    - |-
-      _RES=$({{.tool_path}} {{.send_input}})
-      if [[ "{{.expect_output}}" == "$_RES" ]]; then
-        echo "Test: {{.step_name}} PASSED"
-      else
-        echo "Test: {{.step_name}} FAILED"
-        echo "Expected:={{.expect_output}} != Actual:=$_RES"
-      fi
-
-  test_on_op_full:
-    desc: run test list
-    cmds:
-    - task: test_one_op
-      title: check-only-letters-more-than-5
-      vars: {send_input: abcdef, expect_output: fedcba}
-
-    - task: test_one_op
-      title: check-letters-with-numbers-even
-      vars: {send_input: b12c, expect_output: c21b}
-
-    - task: test_one_op
-      title: check-letters-single
-      vars: {send_input: "g", expect_output: "g"}
-
-    - task: test_one_op
-      title: check-empty-input
-      vars: {send_input: "", expect_output: ""}
-
-   # cmd line base notation
-
   test_on_op_full__cmdlines:
     desc: run test list
     cmds:
@@ -75,9 +39,23 @@ tasks:
       send_input: "$(echo  '{{._item}}' | yq4 e '.send_input' - )"
       expect_output: "$(echo  '{{._item}}' | yq4 e '.expect_output' -)"
     cmds:
-    - task: test_one_op
+    - task: _test_one_op
       vars:
         tool_path: '{{.tool_path}}'
         send_input: "{{.send_input}}"
         expect_output: "{{.expect_output}}"
 
+  _test_one_op:
+    _desc: test one cli operation
+    vars:
+      tool_path: '{{ default .tool_path .tool_path}}'
+      step_name: '{{ default .title .step_name }}'
+    cmds:
+    - |-
+      _RES=$({{.tool_path}} {{.send_input}})
+      if [[ "{{.expect_output}}" == "$_RES" ]]; then
+        echo "Test: {{.step_name}} PASSED"
+      else
+        echo "Test: {{.step_name}} FAILED"
+        echo "Expected:={{.expect_output}} != Actual:=$_RES"
+      fi

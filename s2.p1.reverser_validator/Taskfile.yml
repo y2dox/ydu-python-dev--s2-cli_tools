@@ -3,7 +3,7 @@
 version: '3'
 includes:
   conda_env_man:  ../_tasks/conda_env_man.tasks.yml
-  test_apipy: tests/test__apicli_via_task_validator_test.tasks.yml
+  test_apipy: tests/test__apicli_via_task_powered.tasks.yml
 
 vars:
   conda_main_deps_file: conda_env.conf.yml

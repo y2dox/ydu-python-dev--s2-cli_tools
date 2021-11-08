@@ -1,0 +1,61 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  tool_path: python impls/reverser_impl_sam.py
+#  tool_path: |-
+#    python -c 'import sys; import os; print("" if len(sys.argv) < 2 else str(sys.argv[0] or ""))[::-1]'
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  test_on_op_full__cmdlines:
+    desc: run test list
+    cmds:
+    - task test_apipy:check-only-letters-more-than-5
+    - task test_apipy:check-letters-with-numbers-even
+    - task test_apipy:check-letters-single
+
+  check-only-letters-more-than-5: |-
+    task test_apipy:test_one_op_jscmd title="{{.TASK}}" \
+      _item='{send_input: abcdef, expect_output: fedcba}'
+
+  check-letters-with-numbers-even: |-
+    task test_apipy:test_one_op_jscmd  title="{{.TASK}}" \
+      _item='{send_input: b12c, expect_output: c21b}'
+
+  check-letters-single: |-
+    task test_apipy:test_one_op_jscmd  title="{{.TASK}}" \
+      _item='{send_input: g, expect_output: g}'
+
+  test_one_op_jscmd:
+    _desc: test one cli operation
+    vars:
+      tool_path: '{{ default .tool_path .tool_path}}'
+      send_input: "$(echo  '{{._item}}' | yq4 e '.send_input' - )"
+      expect_output: "$(echo  '{{._item}}' | yq4 e '.expect_output' -)"
+    cmds:
+    - task: _test_one_op
+      vars:
+        tool_path: '{{.tool_path}}'
+        send_input: "{{.send_input}}"
+        expect_output: "{{.expect_output}}"
+
+  _test_one_op:
+    _desc: test one cli operation
+    vars:
+      tool_path: '{{ default .tool_path .tool_path}}'
+      step_name: '{{ default .title .step_name }}'
+    cmds:
+    - |-
+      _RES=$({{.tool_path}} {{.send_input}})
+      if [[ "{{.expect_output}}" == "$_RES" ]]; then
+        echo "Test: {{.step_name}} PASSED"
+      else
+        echo "Test: {{.step_name}} FAILED"
+        echo "Expected:={{.expect_output}} != Actual:=$_RES"
+      fi
