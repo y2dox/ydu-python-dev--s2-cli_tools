@@ -3,6 +3,7 @@
 version: '3'
 includes:
   conda_env_man:  ../_tasks/conda_env_man.tasks.yml
+  test_apipy: tests/test__apicli_via_task_validator_test.tasks.yml
 
 vars:
   conda_main_deps_file: conda_env.conf.yml
@@ -20,4 +21,9 @@ tasks:
     desc: Show general info about Dir API
     cmds:
     - task -s -l
+
+  test:
+    desc: runn ci tests
+    cmds:
+      - task -s test_apipy:test_on_op_full
 

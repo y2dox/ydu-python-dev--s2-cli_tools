@@ -4,7 +4,8 @@ version: '3'
 
 vars:
 #  tool_path: python reverser.py
-  tool_path: python -c 'import sys; import os; print("" if len(sys.argv) <= 1 else sys.argv[1])'
+  tool_path: |-
+    python -c 'import sys; import os; print("" if len(sys.argv) <= 1 else sys.argv[1])'
 
 tasks:
   default:
@@ -35,7 +36,7 @@ tasks:
   test_one_op:
     _desc: test one cli operation
     vars:
-      tool_path: '{{ default .tool_path .tool_path}}
+      tool_path: '{{ default .tool_path .tool_path}}'
     cmds:
     - |-
       _RES=$({{.tool_path}} {{.send_input}})
@@ -45,5 +46,3 @@ tasks:
         echo "Test: {{.step_name}} FAILED"
         echo "Expected:={{.expect_output}} != Actual:=$_RES"
       fi
-
-
