@@ -1,0 +1,18 @@
+
+layout:
+  header:
+    conda_env.conf.yml: {kind: file, content_kind: _yaml_=yml}
+    requirememts.txt: {kind: file, content_kind: _str_=list.txt}
+
+  content:
+    conda_env.conf.yml:
+      dependencies:
+        - python=3.9
+        - pip
+    requirememts.txt: |-
+      pydantic
+      loguru
+      fire
+      pyyaml
+      pytest
+
