@@ -1,0 +1,23 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    silent: true
+    cmds: ['task -s info']
+
+  info:
+    desc: Show general info about Dir API
+    cmds:
+      - |-
+        echo '
+        Only s2.p1.reverser_validator implemented
+        please run
+        cd s2.p1.reverser_validator
+        '
+      - task -s -l
+

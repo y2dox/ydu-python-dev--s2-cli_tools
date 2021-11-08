@@ -1,0 +1,78 @@
+# https://taskfile.dev
+
+version: '3'
+#vars:
+#  conda_main_deps_file: conda_env.conf.yml
+
+tasks:
+
+  info:
+    desc: Show general info about Dir API
+    silent: true
+    cmds:
+    - if [[ "{{.show_env}}" != "" ]]; then env ; fi
+
+    - |-
+      echo "
+      ---
+      _wenv_var={{._wenv_var}}
+      {{._wenv_var}}=${{._wenv_var}}
+      conda_main_deps_file={{.conda_main_deps_file}}
+      "
+
+  cenv-ensure:
+    desc: asserts that cenv-exists
+    description: |-
+      Ensures Environment Conda
+      use __try_as_echo for debug
+    vars:
+      conda_main_deps_linepart__def_val: python=3.9 pip
+      conda_main_deps_linepart: >-
+        {{ if .conda_main_deps_file
+            }} cat {{.conda_main_deps_file}} | yq4 e ".dependencies[]" - | tr '\n' ' ' {{
+        else}} echo conda_main_deps_linepart__def_val {{end}}
+      __try_as_echo__: '{{ if .__try_as_echo}}echo {{end}}'
+    status:
+    - conda list -n ${{._wenv_var}}
+    cmds:
+    - |-
+      {{.__try_as_echo__}} \
+      conda create -y -n ${{._wenv_var}} \
+        $({{.conda_main_deps_linepart}})
+
+  show-activate:
+    desc: show activate command
+    silent: true
+    cmds: ['echo "conda activate ${{._wenv_var}}"']
+
+  runcmd_with_cvenv_activated:
+    desc: run command in activated env cmd:required
+    cmds:
+    - |-
+      export _NEXT_CENV=${{._wenv_var}}
+      bash --login -c '
+      conda activate $_NEXT_CENV
+        {{.cmd}}
+      '
+  shell_cenv:
+    desc: run command in activated env cmd:required
+    cmds:
+    - |-
+      export _NEXT_CENV=${{._wenv_var}}
+      bash --login -c '
+      conda activate $_NEXT_CENV
+        bash
+      '
+
+  shell_cenv_new:
+    desc: run command in activated env cmd:required
+    interactive: true
+    cmds:
+      - |-
+        conda run zsh -n ${{._wenv_var}}
+
+  runcmd_with_cenvrun:
+    desc: run command via conda or mamba run
+    cmds:
+    - |-
+      conda run {{.cmd}} -n ${{._wenv_var}}

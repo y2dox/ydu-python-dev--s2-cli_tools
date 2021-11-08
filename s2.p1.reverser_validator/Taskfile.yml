@@ -1,0 +1,23 @@
+# https://taskfile.dev
+
+version: '3'
+includes:
+  conda_env_man:  ../_tasks/conda_env_man.tasks.yml
+
+vars:
+  conda_main_deps_file: conda_env.conf.yml
+  _wenv_var: _wenv__s2p1_CVENV_NAME
+
+env:
+  _wenv__s2p1_CVENV_NAME: pydevops-s2p1-reverser
+
+tasks:
+  default:
+    silent: true
+    cmds: ['task -s info']
+
+  info:
+    desc: Show general info about Dir API
+    cmds:
+    - task -s -l
+
