@@ -1,0 +1,56 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  tool_path: python impls/reverser_impl_sam.py
+#  tool_path: |-
+#    python -c 'import sys; import os; print("" if len(sys.argv) < 2 else str(sys.argv[0] or ""))[::-1]'
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  run-subtask:
+    desc: _
+    preconditions:
+      - msg: 'Title-Required'
+        sh: ' [[ "{{.title}}" != "" ]] '
+    vars:
+      taskfilename: test__apicli_via_task_powered.tasks.yml
+      parenttask: test_on_op_full
+    cmds:
+      - task test_apipy:test_one_op
+
+  test_on_op_full:
+    desc: run test list
+    cmds:
+    - task: test_one_op
+      vars: { title: check-only-letters-more-than-5,
+              send_input: abcdef, expect_output: fedcba}
+    - task: test_one_op
+      vars: { title: check-letters-with-numbers-even,
+              send_input: b12c, expect_output: c21b}
+    - task: test_one_op
+      vars: { title: check-letters-single,
+              send_input: g, expect_output: g}
+    - task: test_one_op
+      vars: { title: check-letters-single,
+              send_input: '""', expect_output: ''}
+
+  test_one_op:
+    _desc: test one cli operation
+    vars:
+      tool_path: '{{ default .tool_path .tool_path}}'
+      step_name: '{{ default .title .step_name }}'
+    cmds:
+    - |-
+      _RES=$({{.tool_path}} {{.send_input}})
+      if [[ "{{.expect_output}}" == "$_RES" ]]; then
+        echo "Test: {{.step_name}} PASSED"
+      else
+        echo "Test: {{.step_name}} FAILED"
+        echo "Expected:={{.expect_output}} != Actual:=$_RES"
+      fi
