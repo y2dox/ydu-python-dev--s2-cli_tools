@@ -17,14 +17,14 @@ tasks:
     desc: run test list
     cmds:
     - task test_apipy:check-only-letters-more-than-5
-    - task test_apipy:check-letters-with-numbers-even
+    - task test_apipy:check-string-with-even-number-of-letters
     - task test_apipy:check-letters-single
 
   check-only-letters-more-than-5: |-
     task test_apipy:test_one_op_jscmd title="{{.TASK}}" \
       _item='{send_input: abcdef, expect_output: fedcba}'
 
-  check-letters-with-numbers-even: |-
+  check-string-with-even-number-of-letters: |-
     task test_apipy:test_one_op_jscmd  title="{{.TASK}}" \
       _item='{send_input: b12c, expect_output: c21b}'
 
